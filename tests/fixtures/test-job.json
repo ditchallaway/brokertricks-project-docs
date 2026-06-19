@@ -1,0 +1,49 @@
+[
+  {
+    "acres": "6.5",
+    "owner": "KISTING, WARREN V & MARIA T",
+    "elevation": 655,
+    "lat": "48.332259",
+    "lon": "-116.486948",
+    "county": "Bonner County",
+    "customer_id": "cust_12345",
+    "order_id": "order_12345",
+    "is_test": true,
+    "boundary": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -116.4868255,
+            48.3317135
+          ],
+          [
+            -116.485553,
+            48.3317135
+          ],
+          [
+            -116.4855585,
+            48.332807
+          ],
+          [
+            -116.488335,
+            48.3328055
+          ],
+          [
+            -116.488341,
+            48.332094
+          ],
+          [
+            -116.4883485,
+            48.3317135
+          ],
+          [
+            -116.4868255,
+            48.3317135
+          ]
+        ]
+      ]
+    },
+    "srcmap": "https://maps.googleapis.com/maps/api/staticmap?size=1200x1200&scale=2&maptype=satellite&path=color:0xffff00ff|weight:4|48.3317135,-116.4868255|48.3317135,-116.4855530|48.3328070,-116.4855585|48.3328055,-116.4883350|48.3320940,-116.4883410|48.3317135,-116.4883485|48.3317135,-116.4868255&key=AIzaSyBH98WxAx5gUHvvKSwhoKpyfQQiBS5dUJ0"
+  }
+]

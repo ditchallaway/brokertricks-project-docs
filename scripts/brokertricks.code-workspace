@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../n8n-as-code"
+		},
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../editor"
+		}
+	],
+	"settings": {}
+}

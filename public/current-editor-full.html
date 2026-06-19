@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photopea Property Editor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --surface-color: rgba(25, 33, 49, 0.6);
+      --primary-glow: rgba(79, 70, 229, 0.4);
+      --secondary-glow: rgba(236, 72, 153, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Outfit", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Ambient Glow Background */
+    .ambient-glow1,
+    .ambient-glow2 {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: -1;
+      animation: pulse 8s infinite alternate;
+    }
+
+    .ambient-glow1 {
+      background: var(--primary-glow);
+      width: 500px;
+      height: 500px;
+      top: -100px;
+      left: -100px;
+    }
+
+    .ambient-glow2 {
+      background: var(--secondary-glow);
+      width: 400px;
+      height: 400px;
+      bottom: -50px;
+      right: -100px;
+      animation-delay: 4s;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1) translate(0, 0);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(1.1) translate(20px, -20px);
+        opacity: 0.8;
+      }
+    }
+
+    .dashboard-header {
+      background: var(--surface-color);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .header-left h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a5b4fc, #fbcfe8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .header-left p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .header-right {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent), #ec4899);
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: all 0.5s ease;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.02);
+      box-shadow: 0 5px 15px -3px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(34, 197, 94, 0.1);
+      color: #4ade80;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: rgba(34, 197, 94, 0.6);
+      transform: scale(1.02);
+      box-shadow: 0 5px 15px -3px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .editor-container {
+      flex: 1;
+      width: 100%;
+      padding: 1rem;
+      z-index: 1;
+    }
+
+    .editor-wrapper {
+      width: 100%;
+      height: 100%;
+      background: #111;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow1"></div>
+  <div class="ambient-glow2"></div>
+
+  <header class="dashboard-header">
+    <div class="header-left">
+      <h1>Property Editor</h1>
+      <p id="meta-info">Loading property data...</p>
+    </div>
+    <div class="header-right">
+      <button id="save-btn" class="btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          <polyline points="17 21 17 13 7 13 7 21"></polyline>
+          <polyline points="7 3 7 8 15 8"></polyline>
+        </svg>
+        Save Current to R2
+      </button>
+      <button id="fulfill-btn" class="btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        Approve & Fulfill
+      </button>
+    </div>
+  </header>
+
+  <main class="editor-container">
+    <div class="editor-wrapper">
+      <iframe id="photopea-frame" allow="clipboard-read; clipboard-write" src=""></iframe>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const customerId = urlParams.get('customer_id') || 'Unknown Customer';
+      const orderId = urlParams.get('order_id') || 'Unknown Order';
+      const acreage = urlParams.get('acreage') || 'N/A';
+      
+      // Update meta info display
+      document.getElementById('meta-info').textContent = `Customer: ${customerId} | Order: ${orderId} | Acres: ${acreage}`;
+
+      // Get the Photopea config from the URL hash
+      const hash = window.location.hash;
+      const iframe = document.getElementById('photopea-frame');
+      
+      if (hash) {
+        // Load Photopea with the payload injected via the hash
+        iframe.src = `https://www.photopea.com${hash}`;
+      } else {
+        iframe.src = 'https://www.photopea.com';
+        console.warn('No Photopea payload found in the URL hash.');
+      }
+
+      // Handle the Fulfill button
+      const fulfillmentId = urlParams.get('fulfillment_id') || '';
+      const fulfillBtn = document.getElementById('fulfill-btn');
+      
+      if (!fulfillmentId) {
+        fulfillBtn.disabled = true;
+        fulfillBtn.title = "No fulfillment ID provided in URL";
+        fulfillBtn.style.opacity = "0.5";
+        fulfillBtn.style.cursor = "not-allowed";
+      }
+
+      fulfillBtn.addEventListener('click', () => {
+        if (!fulfillmentId) {
+          alert('Error: No fulfillment ID found in URL.');
+          return;
+        }
+
+        if (confirm('Are you sure you want to approve and fulfill this order in SureCart? This action is irreversible.')) {
+          fulfillBtn.disabled = true;
+          const originalText = fulfillBtn.innerHTML;
+          fulfillBtn.innerHTML = `
+            <svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; animation: spin 1s linear infinite;">
+              <line x1="12" y1="2" x2="12" y2="6"></line>
+              <line x1="12" y1="18" x2="12" y2="22"></line>
+              <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+              <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+              <line x1="2" y1="12" x2="6" y2="12"></line>
+              <line x1="18" y1="12" x2="22" y2="12"></line>
+              <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+              <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+            </svg>
+            Fulfilling...
+          `;
+
+          fetch('https://auto.brokertricks.com/webhook/fulfill', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ fulfillment_id: fulfillmentId })
+          })
+          .then(async (response) => {
+            if (!response.ok) {
+              const errText = await response.text();
+              throw new Error(errText || `Server returned ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            fulfillBtn.innerHTML = `
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Fulfilled!
+            `;
+            // Keep disabled
+          })
+          .catch(error => {
+            console.error('Fulfillment failed:', error);
+            alert(`Fulfillment failed: ${error.message}`);
+            fulfillBtn.innerHTML = originalText;
+            fulfillBtn.disabled = false;
+          });
+        }
+      });
+
+      // Handle the Save button
+      const saveBtn = document.getElementById('save-btn');
+      saveBtn.addEventListener('click', () => {
+        // Send a postMessage to Photopea to trigger the save command.
+        // Photopea API uses ExtendScript execution via postMessage.
+        // 'app.activeDocument.saveToOE("png")' tells Photopea to export the current 
+        // active document as PNG and POST it to the server.url defined in the payload.
+        iframe.contentWindow.postMessage('app.activeDocument.saveToOE("png");', '*');
+        
+        // Optional: show some feedback
+        const originalText = saveBtn.innerHTML;
+        saveBtn.innerHTML = `
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          Saving...
+        `;
+        setTimeout(() => {
+          saveBtn.innerHTML = originalText;
+        }, 2000);
+      });
+      
+      // Optional: Listen for replies from Photopea (like successful save)
+      window.addEventListener("message", (e) => {
+        // Photopea sends "done" when the script executes successfully
+        if (e.data === "done") {
+          console.log("Photopea command executed successfully.");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.git/
+test-results/
+output/
+*.log
+.env.local
+.vscode/
+.agent/
+.agents/

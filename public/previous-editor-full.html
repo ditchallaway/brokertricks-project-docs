@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Property Photo Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="pea.js"></script>
+    <style>
+      :root {
+        --bg-primary: #0a0e1a;
+        --bg-surface: rgba(20, 27, 45, 0.85);
+        --bg-surface-hover: rgba(30, 40, 65, 0.9);
+        --accent: #6366f1;
+        --accent-glow: rgba(99, 102, 241, 0.3);
+        --success: #22c55e;
+        --success-glow: rgba(34, 197, 94, 0.2);
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --border: rgba(255, 255, 255, 0.08);
+        --border-active: rgba(99, 102, 241, 0.4);
+        --yellow: #ffff00;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Outfit", sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* ── Top Bar ─────────────────────────────────── */
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 0.6rem 1.2rem;
+        background: var(--bg-surface);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+        z-index: 10;
+        flex-shrink: 0;
+      }
+
+      .topbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        white-space: nowrap;
+      }
+
+      .topbar-brand .icon {
+        font-size: 1.3rem;
+      }
+
+      .topbar-meta {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .meta-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 6px;
+        font-size: 0.78rem;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        white-space: nowrap;
+      }
+
+      .meta-chip .label {
+        color: var(--text-muted);
+        font-weight: 400;
+      }
+      .meta-chip.direction {
+        background: rgba(99, 102, 241, 0.12);
+        border-color: var(--border-active);
+        color: #a5b4fc;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      .meta-chip.acreage {
+        background: rgba(255, 255, 0, 0.08);
+        border-color: rgba(255, 255, 0, 0.2);
+        color: var(--yellow);
+        font-weight: 600;
+      }
+
+      .topbar-status {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        white-space: nowrap;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--text-muted);
+        transition: background 0.3s;
+      }
+      .status-dot.loading {
+        background: var(--warning);
+        animation: pulse-dot 1.2s infinite;
+      }
+      .status-dot.ready {
+        background: var(--success);
+        box-shadow: 0 0 8px var(--success-glow);
+      }
+      .status-dot.error {
+        background: var(--error);
+      }
+
+      @keyframes pulse-dot {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      /* ── Action Bar (below topbar) ───────────────── */
+      .action-bar {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.45rem 1.2rem;
+        background: rgba(15, 20, 35, 0.9);
+        border-bottom: 1px solid var(--border);
+        flex-shrink: 0;
+      }
+
+      .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.9rem;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-secondary);
+        font-family: "Outfit", sans-serif;
+        font-size: 0.78rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+
+      .action-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.15);
+        color: var(--text-primary);
+      }
+
+      .action-btn.primary {
+        background: linear-gradient(135deg, var(--accent), #8b5cf6);
+        border-color: transparent;
+        color: white;
+      }
+      .action-btn.primary:hover {
+        box-shadow: 0 4px 12px var(--accent-glow);
+        transform: translateY(-1px);
+      }
+
+      .action-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
+      }
+
+      .action-spacer {
+        flex: 1;
+      }
+
+      .action-hint {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-style: italic;
+      }
+
+      /* ── Editor Container ────────────────────────── */
+      .editor-wrapper {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+      }
+
+      #photopea-container {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* ── Loading Overlay ─────────────────────────── */
+      .loading-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-primary);
+        z-index: 20;
+        transition:
+          opacity 0.5s,
+          visibility 0.5s;
+      }
+
+      .loading-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .loader-ring {
+        width: 48px;
+        height: 48px;
+        border: 3px solid var(--border);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+        margin-bottom: 1.5rem;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+      }
+
+      .loading-step {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        max-width: 400px;
+        text-align: center;
+      }
+
+      /* ── Error State ─────────────────────────────── */
+      .error-card {
+        background: var(--bg-surface);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 16px;
+        padding: 2.5rem;
+        max-width: 500px;
+        text-align: center;
+      }
+
+      .error-card h2 {
+        color: var(--error);
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+      }
+
+      .error-card p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      .error-card code {
+        display: block;
+        margin-top: 1rem;
+        padding: 0.75rem;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        word-break: break-all;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-brand">
+        <span class="icon">📸</span>
+        <span>Property Editor</span>
+      </div>
+      <div class="topbar-meta" id="meta-chips">
+        <!-- Filled by JS -->
+      </div>
+      <div class="topbar-status">
+        <div class="status-dot loading" id="status-dot"></div>
+        <span id="status-text">Initializing...</span>
+      </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <button class="action-btn primary" id="btn-run-action" disabled>
+        ✨ Run Pop Effect
+      </button>
+      <button class="action-btn" id="btn-add-acreage" disabled>
+        📐 Re-add Acreage Text
+      </button>
+      <div class="action-spacer"></div>
+      <span class="action-hint" id="action-hint">Loading editor...</span>
+    </div>
+
+    <!-- Editor -->
+    <div class="editor-wrapper">
+      <div class="loading-overlay" id="loading-overlay">
+        <div class="loader-ring"></div>
+        <div class="loading-text" id="loading-text">Starting Photopea...</div>
+        <div class="loading-step" id="loading-step">
+          This usually takes a few seconds
+        </div>
+      </div>
+      <div id="photopea-container"></div>
+    </div>
+
+    <script>
+      // ── Parse Query Params ──────────────────────────────────
+      const params = new URLSearchParams(window.location.search);
+      const CONFIG = {
+        customer_id: params.get("customer_id") || "",
+        order_id: params.get("order_id") || "",
+        direction: params.get("direction") || "",
+        acreage: params.get("acreage") || "",
+        r2Base: "https://pics.brokertricks.com",
+        actionSet: "https://app.brokertricks.com/actions.atn",
+      };
+
+      // ── Validate ────────────────────────────────────────────
+      if (!CONFIG.customer_id || !CONFIG.order_id || !CONFIG.direction) {
+        document.getElementById("loading-overlay").innerHTML = `
+                <div class="error-card">
+                    <h2>⚠️ Missing Parameters</h2>
+                    <p>This editor requires URL parameters to load an order.</p>
+                    <code>?customer_id=X&order_id=Y&direction=north&acreage=5.00 ACRES</code>
+                    <p style="margin-top:1rem; font-size:0.85rem;">
+                        <strong>customer_id:</strong> ${CONFIG.customer_id || "❌ missing"}<br>
+                        <strong>order_id:</strong> ${CONFIG.order_id || "❌ missing"}<br>
+                        <strong>direction:</strong> ${CONFIG.direction || "❌ missing"}<br>
+                        <strong>acreage:</strong> ${CONFIG.acreage || "(optional)"}
+                    </p>
+                </div>
+            `;
+        throw new Error("Missing required query parameters");
+      }
+
+      // Build the image URL
+      const IMAGE_URL = `${CONFIG.r2Base}/${CONFIG.customer_id}/${CONFIG.order_id}/property_${CONFIG.direction}.png`;
+
+      // ── Populate UI ─────────────────────────────────────────
+      document.title = `${CONFIG.direction.toUpperCase()} — ${CONFIG.order_id} — Property Editor`;
+
+      const metaChips = document.getElementById("meta-chips");
+      metaChips.innerHTML = `
+            <span class="meta-chip"><span class="label">Customer</span> ${CONFIG.customer_id}</span>
+            <span class="meta-chip"><span class="label">Order</span> ${CONFIG.order_id}</span>
+            <span class="meta-chip direction">${CONFIG.direction}</span>
+            ${CONFIG.acreage ? `<span class="meta-chip acreage">${CONFIG.acreage}</span>` : ""}
+        `;
+
+      // ── Helpers ─────────────────────────────────────────────
+      function setStatus(text, state) {
+        document.getElementById("status-text").textContent = text;
+        const dot = document.getElementById("status-dot");
+        dot.className = "status-dot " + state;
+      }
+
+      function setLoading(text, step) {
+        document.getElementById("loading-text").textContent = text;
+        if (step) document.getElementById("loading-step").textContent = step;
+      }
+
+      function hideLoading() {
+        document.getElementById("loading-overlay").classList.add("hidden");
+      }
+
+      async function fetchArrayBuffer(url) {
+        const response = await fetch(url);
+        if (!response.ok)
+          throw new Error(
+            `Failed to fetch ${url}: ${response.status} ${response.statusText}`,
+          );
+        return await response.arrayBuffer();
+      }
+
+      function delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+
+      // ── Acreage Script Builder ──────────────────────────────
+      function buildAcreageScript(acreageText) {
+        // Escape quotes in acreage text for ExtendScript
+        const escaped = acreageText.replace(/"/g, '\\"');
+        return `
+var doc = app.activeDocument;
+var textLayer = doc.artLayers.add();
+textLayer.kind = LayerKind.TEXT;
+textLayer.textItem.contents = "${escaped}";
+var c = new SolidColor();
+c.rgb.hexValue = "FFFF00";
+textLayer.textItem.color = c;
+textLayer.textItem.size = 120;
+textLayer.textItem.justification = Justification.LEFT;
+textLayer.textItem.position = [100, 1400];
+            `.trim();
+      }
+
+      // ── Main Init ───────────────────────────────────────────
+      let PEA = null; // Photopea instance
+      let ACTION_SET_LOADED = false;
+
+      async function init() {
+        try {
+          // Step 1: Create Photopea embed
+          setLoading(
+            "Starting Photopea...",
+            "Initializing the editor environment",
+          );
+          const container = document.getElementById("photopea-container");
+          PEA = await Photopea.createEmbed(container);
+
+          // Quick test
+          const hello = await PEA.runScript('app.echoToOE("ready");');
+          console.log("[Editor] Photopea ready:", hello);
+          setStatus("Loading assets...", "loading");
+
+          // Step 2: Load the action set
+          setLoading(
+            "Loading action set...",
+            "Fetching boundary pop effect actions",
+          );
+          try {
+            const atnBuffer = await fetchArrayBuffer(CONFIG.actionSet);
+            await PEA.loadAsset(atnBuffer);
+            ACTION_SET_LOADED = true;
+            console.log("[Editor] Action set loaded");
+          } catch (err) {
+            console.warn("[Editor] Action set failed to load:", err.message);
+            // Non-fatal: editor can still work without it
+          }
+
+          // Step 3: Load the property image
+          setLoading("Loading property image...", IMAGE_URL);
+          const imageBuffer = await fetchArrayBuffer(IMAGE_URL);
+          await PEA.loadAsset(imageBuffer);
+          console.log("[Editor] Image loaded:", IMAGE_URL);
+
+          // Give Photopea a moment to fully render the image
+          await delay(1000);
+
+          // Step 4: Add acreage text layer
+          if (CONFIG.acreage) {
+            setLoading("Adding acreage text...", CONFIG.acreage);
+            await PEA.runScript(buildAcreageScript(CONFIG.acreage));
+            console.log("[Editor] Acreage text added:", CONFIG.acreage);
+          }
+
+          // Done!
+          setStatus("Ready", "ready");
+          hideLoading();
+
+          // Enable action buttons
+          document.getElementById("btn-run-action").disabled =
+            !ACTION_SET_LOADED;
+          document.getElementById("btn-add-acreage").disabled = !CONFIG.acreage;
+          document.getElementById("action-hint").textContent = ACTION_SET_LOADED
+            ? 'Action set loaded — click "Run Pop Effect" to apply boundary styling'
+            : "Action set unavailable — boundary effects must be applied manually";
+        } catch (err) {
+          console.error("[Editor] Init failed:", err);
+          setStatus("Error", "error");
+          document.getElementById("loading-overlay").innerHTML = `
+                    <div class="error-card">
+                        <h2>❌ Failed to Load</h2>
+                        <p>${err.message}</p>
+                        <code>${IMAGE_URL}</code>
+                        <p style="margin-top:1rem;">
+                            <a href="${window.location.href}" style="color: var(--accent);">Reload</a> or check the browser console for details.
+                        </p>
+                    </div>
+                `;
+        }
+      }
+
+      // ── Button Handlers ─────────────────────────────────────
+      document
+        .getElementById("btn-run-action")
+        .addEventListener("click", async () => {
+          if (!PEA || !ACTION_SET_LOADED) return;
+
+          const btn = document.getElementById("btn-run-action");
+          btn.disabled = true;
+          btn.textContent = "⏳ Running...";
+          setStatus("Running action...", "loading");
+
+          try {
+            await PEA.runScript('app.doAction("Action 0", "Action Set 0");');
+            // Give it time to complete the action visually
+            await delay(3000);
+            setStatus("Ready", "ready");
+            btn.textContent = "✨ Run Pop Effect";
+          } catch (err) {
+            console.error("[Editor] Action failed:", err);
+            setStatus("Action failed", "error");
+            btn.textContent = "✨ Run Pop Effect (retry)";
+          }
+          btn.disabled = false;
+        });
+
+      document
+        .getElementById("btn-add-acreage")
+        .addEventListener("click", async () => {
+          if (!PEA || !CONFIG.acreage) return;
+
+          const btn = document.getElementById("btn-add-acreage");
+          btn.disabled = true;
+
+          try {
+            await PEA.runScript(buildAcreageScript(CONFIG.acreage));
+            console.log("[Editor] Acreage text re-added");
+          } catch (err) {
+            console.error("[Editor] Acreage script failed:", err);
+          }
+          btn.disabled = false;
+        });
+
+      // ── Start ───────────────────────────────────────────────
+      init();
+    </script>
+  </body>
+</html>

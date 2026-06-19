@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/ditchallaway/Robotic-Property-Photographer/schemas/workflow-inputs.schema.json",
+  "title": "RPP GitHub Action Inputs",
+  "description": "Inputs for the Robotic Property Photographer GitHub Action (Snapshots workflow). Applies to both workflow_dispatch manual triggers and repository_dispatch client_payload objects. The full schema for the job_json payload is defined in job-payload.schema.json.",
+  "type": "object",
+  "required": ["job_json"],
+  "properties": {
+    "job_json": {
+      "description": "JSON-encoded render job specification. Must be a valid JSON string that deserializes to either a single job object or a single-element array containing one job object. See job-payload.schema.json for the full schema of the parsed payload.",
+      "type": "string",
+      "contentMediaType": "application/json",
+      "examples": [
+        "{\"centroid\":{\"lon\":-116.4869,\"lat\":48.3322},\"elevation\":655,\"boundary\":{\"type\":\"Polygon\",\"coordinates\":[[[-116.4868,48.3317],[-116.4856,48.3317],[-116.4856,48.3328],[-116.4883,48.3328],[-116.4883,48.3317],[-116.4868,48.3317]]]}}"
+      ]
+    },
+    "resumeUrl": {
+      "description": "Webhook callback URL automatically injected by n8n dispatchAndWait. When non-empty the workflow POSTs {\"run_id\": \"<github_run_id>\"} to this URL upon successful completion.",
+      "type": "string",
+      "format": "uri"
+    },
+    "snapshot_mode": {
+      "description": "Controls which camera shots are captured. Defaults to 'all'.",
+      "type": "string",
+      "enum": ["overhead_only", "overhead_north", "all"],
+      "default": "all",
+      "$comment": "overhead_only → 1 shot (overhead); overhead_north → 2 shots (overhead, north); all → 5 shots (overhead, north, east, south, west)"
+    }
+  },
+  "additionalProperties": false
+}
