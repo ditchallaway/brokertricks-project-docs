@@ -3,6 +3,8 @@
 **Date:** 2026-05-01  
 **Status:** Approved (v2 — pivoted from URL hash to embedded editor)
 
+> **Architecture Update (2026-07-08):** This workflow mechanism applies strictly to **Image Pack products**. Pure digital products (like the `kml_only` pack) completely bypass the Photopea URL Builder and are handled via a Zero-Touch Auto-Fulfill pipeline (see `2026-07-08-kml-auto-fulfill-and-swag-design.md`).
+
 ## Purpose
 
 Generate URLs to an embedded Photopea editor page that opens rendered property
@@ -96,11 +98,12 @@ https://app.brokertricks.com/editor.html?customer_id=cust_12345&order_id=order_1
 
 ### Product → Shot Mapping
 
-| Product ID | Shots |
-|---|---|
-| `single_overhead` | `["overhead"]` |
-| `single_north` | `["north"]` |
-| `full` | `["north", "east", "south", "west", "overhead"]` |
+| Product ID | Shots | Note |
+|---|---|---|
+| `single_overhead` | `["overhead"]` | Requires Photopea Alignment |
+| `single_north` | `["north"]` | Requires Photopea Alignment |
+| `full` | `["north", "east", "south", "west", "overhead"]` | Requires Photopea Alignment |
+| `kml_only` | `[]` | **Bypassed** (Auto-Fulfilled instantly) |
 
 ### Output
 
