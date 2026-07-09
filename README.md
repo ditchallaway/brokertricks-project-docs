@@ -16,7 +16,7 @@ To provide accurate guidance, maintain the following structural context of the B
 * **Frontend & Commerce:** Nginx serves the customer-facing WordPress site utilizing SureCart for order management.
 * **Orchestration:** n8n runs within Docker, handling webhooks, automation, and triggering external services.
 * **Rendering Pipeline:** High-GPU overhead rendering tasks run entirely in GitHub Actions as a stateless microservice. n8n dispatches payloads to this Action.
-* **Fulfillment Philosophy:** Workflows adhere to a "Human in the Loop" design. Automated data enrichment processes pause for manual quality control, allowing an editor to approve and fulfill property images using Photopea before final delivery.
+* **Fulfillment Philosophy:** Image workflows adhere to a strict "Human in the Loop" design, pausing for manual quality control to allow an editor to approve and align property images using Photopea. However, pure digital assets (e.g., KML-Only packages) and integrated Print-on-Demand swag (e.g., Printify) bypass the editor and are processed via a "Zero-Touch Auto-Fulfill" path.
 
 ## Repository Structure
 
