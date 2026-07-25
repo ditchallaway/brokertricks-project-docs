@@ -4,7 +4,7 @@
 >
 > **Current Objective:** Produce 5 PNG images of a property boundary — north, east, south, west, and overhead — from a JSON parcel payload.
 >
-> **Architecture constraint:** This service is a stateless rendering engine. It receives a JSON payload (via CLI stdin or file arg) and returns PNG assets. Long-term storage, job queuing, and notifications are handled by upstream n8n.
+> **Architecture constraint:** This service is a stateless **internal** rendering engine. It receives a JSON payload (via CLI stdin or file arg) and returns PNG assets that serve as the baseline for the human editor during fulfillment. Long-term storage, job queuing, and notifications are handled by upstream n8n.
 
 ---
 
