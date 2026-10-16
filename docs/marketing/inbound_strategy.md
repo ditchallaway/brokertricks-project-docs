@@ -1,7 +1,7 @@
 # Brokertricks Inbound Strategy: SEO, GEO & AEO
 
 ## Executive Summary
-Brokertricks is a **done-for-you service** (not a self-serve SaaS) that delivers professional, MLS-compliant land listing images in 24 hours. The fulfillment pipeline utilizes an internal headless microservice to generate base assets, which are then manually composited by a human editor to ensure the highest quality ("pop out of the frame" realism) and accurate property boundaries.
+Brokertricks is a **"Service as a Software" microsaas** that delivers professional, MLS-compliant land listing images in minutes.
 
 This inbound strategy utilizes a Hub & Spoke SEO model targeted directly at land agents and brokers, combined with Generative/Answer Engine Optimization (GEO/AEO) to capture organic AI search traffic.
 
@@ -62,9 +62,9 @@ This structure supports the SEO/GEO strategy while seamlessly integrating with y
 ### Fulfillment Architecture
 Fulfillment relies on a seamless, zero-plugin approach:
 1. Agent completes purchase via SureCart.
-2. Internal headless engine and human editor generate the assets.
+2. The distributed rendering pipeline generates the assets.
 3. n8n hits the SureCart Notes API to append a secure link to the order.
 4. The link points to the `/fulfillment` template which dynamically displays:
-    * Thumb-friendly (stacked) buttons for **Web/MLS** and **Print** sizes.
-    * KML download with usage instructions and video explainer.
+    * Thumbnail of purchased image.
+    * Download buttons for **Web/MLS** and **Print** sizes for each image.
     * A master "Download All (Zipped)" option for desktop users.

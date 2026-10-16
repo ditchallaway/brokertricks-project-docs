@@ -5,8 +5,6 @@ This repository is the authoritative source of truth for the system architecture
 
 **Do not write, propose, or inject execution code, rendering scripts, or microservices into this repository.**
 
-The actual rendering engine (the GitHub Action-based stateless microservice utilizing CesiumJS) lives in its own isolated execution repository. If you are asked to modify image generation code, you are in the wrong environment.
-
 ## System Architecture Overview
 
 To provide accurate guidance, maintain the following structural context of the Brokertricks production environment:
@@ -15,14 +13,18 @@ To provide accurate guidance, maintain the following structural context of the B
 * **Routing & Proxy:** Cloudpanel acts as a reverse proxy for Nginx.
 * **Frontend & Commerce:** Nginx serves the customer-facing WordPress site utilizing SureCart for order management.
 * **Orchestration:** n8n runs within Docker, handling webhooks, automation, and triggering external services.
-* **Rendering Pipeline:** High-GPU overhead rendering tasks run entirely in GitHub Actions as a stateless microservice. n8n dispatches payloads to this Action.
-* **Fulfillment Philosophy:** Image workflows adhere to a strict "Human in the Loop" design, pausing for manual quality control to allow an editor to approve and align property images using Photopea. However, pure digital assets (e.g., KML-Only packages) and integrated Print-on-Demand swag (e.g., Printify) bypass the editor and are processed via a "Zero-Touch Auto-Fulfill" path.
+* **Rendering Pipeline:** n8n's generation stack is a distributed collection of APIs:
+  * **Overhead Images:** Google Static Maps API is used for top-down image rendering.
+  * **Oblique Shots:** Rendering runs containerized CesiumJS Puppeteer in GitHub Actions.
+  * **Image Enhancement & Enrichment:** Custom PixelFlow workflows from Segmind.com use AI to enhance the image and add layers of enrichment data graphics.
+* **Fulfillment:** Order deliverables are fulfilled and accessed through the customer-facing SureCart dashboard.
 
-## Repository Structure
+## Repository Context Architecture
 
-* `/requirements/` - Strict business rules, input/output schemas, and product definitions for map-based infographics.
-* `/architecture/` - Network topology, VPS configuration, database schemas (e.g., PostgreSQL idempotency gates), and Docker Compose setups.
-* `/plans/` - Historical decision logs, failed experiments (e.g., deprecated n8n subagent workflows), and future roadmap documents.
+This repository is structured to manage operational and architectural context modularly (analogous to the skills directory pattern):
+
+* Each functional domain maintains its own scope of truth, core operational rules, and reference specs to allow progressive context loading without cognitive or prompt bloat.
+* Specifications here serve as authoritative design contracts across the distributed n8n workflows, WordPress plugins/themes, and external API integrations.
 
 ## Agent Operational Rules
 
